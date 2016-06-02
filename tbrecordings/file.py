@@ -13,6 +13,7 @@ class File(object):
     self.ts = ts
     self.duration = duration
     self.splits = 0
+    self.meta = {}
 
   def slice(self, start_ts=0, stop_ts=0):
     start_ts -= self.ts
@@ -29,3 +30,6 @@ class File(object):
       self.splits += 1
 
     return file, cmd
+
+  def set_meta(self, key, value):
+    self.meta[key] = value

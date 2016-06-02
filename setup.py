@@ -6,7 +6,9 @@ setup(
   packages=['tbrecordings'],
   include_package_data=True,
   install_requires=[
-    'amfast'
+    'amfast',
+    'boto3',
+    'Pillow'
   ],
   entry_points = {
     'console_scripts': ['tbrecording=tbrecordings.tbrecording:main']

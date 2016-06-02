@@ -1,1 +1,3 @@
 amfast
+boto3
+Pillow
