@@ -3,11 +3,12 @@ FROM ubuntu:14.04
 MAINTAINER Ilia Yakubovsky
 
 # Update the sources list
-RUN apt-get update
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository ppa:libreoffice/ppa && apt-get update
 
 # Install basic applications
 RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential autoconf python-dev
-RUN apt-get install -y pkg-config automake gcc g++ libtool make nasm tar bzip2 libmp3lame-dev
+RUN apt-get install -y pkg-config automake gcc g++ libtool make nasm tar bzip2 libmp3lame-dev libreoffice
 
 RUN export MAKEFLAGS="-j$[$(nproc) + 1]"
 
