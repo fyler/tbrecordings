@@ -132,7 +132,7 @@ class Prepare(Action):
       cmd += '-c:v libx264 -keyint_min 15 -g 15 '
       cmd += '-c:a libfdk_aac '
       cmd += self.out.fullname
-    elif file.type == 'presentation' and (file.extension == '.ppt' or file.extension == '.pptx'):
+    elif file.type == 'presentation' and file.extension != '.pdf':
       cmd = 'libreoffice --headless --invisible --convert-to pdf --outdir %s %s' % (file.path, file.fullname)
       self.out = File(file.filename, path=file.path, extension='.pdf', ts=file.ts)
     elif file.type == 'slide' and (file.meta['width'] % 2 == 1 or file.meta['height'] % 2 == 1):
