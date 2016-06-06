@@ -37,3 +37,14 @@ RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
 RUN git clone https://github.com/fyler/tbrecordings.git && cd tbrecordings &&\
   python setup.py install
 
+RUN useradd -m deplo
+USER deplo
+
+ENV HOME /home/deplo/
+ENV AWS_CONFIG_FILE $HOME.aws/config
+
+RUN mkdir $HOME/.aws/
+
+COPY config $AWS_CONFIG_FILE
+
+ENTRYPOINT tbrecording -i $INPUT
