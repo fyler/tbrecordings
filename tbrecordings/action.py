@@ -107,7 +107,6 @@ class GetSlides(Action):
         self.slides += 1
     if self.slides == 0:
       raise ActionError('Generation slides failed: %s' % err)
-    cmd = 'ffprobe -v quiet -print_format json -show_streams '
     for i in xrange(self.slides):
       self.out[i + 1] = File('%s_%d' % (self.input[0].filename, i + 1), path=self.path, extension='.png', type='slide')
       with Image.open(self.out[i + 1].fullname) as im:
@@ -219,8 +218,13 @@ class Render(Action):
     return cmd
 
   def check(self, out, err):
+    cmd = 'ffprobe -v quiet -print_format json -show_format ' + self.out.fullname
     if not os.path.exists(self.out.fullname):
-      raise ActionError('Rendering failed: %s' % err)
+      raise ActionError('Rendering failed: %s' % err):
+    else:
+      info = json.loads(shell_cmd(cmd)[0])
+      if not 'format' in info:
+        raise ActionError('Rendering failed: %s' % err):
 
 class Concat(Action):
   def __init__(self, actions, name='recording', path=None):
