@@ -4,11 +4,12 @@ MAINTAINER Ilia Yakubovsky
 
 # Update the sources list
 RUN apt-get update && apt-get install -y software-properties-common
-RUN add-apt-repository ppa:libreoffice/ppa && apt-get update
+RUN add-apt-repository ppa:libreoffice/libreoffice-5-1 && apt-get update
 
 # Install basic applications
 RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential autoconf python-dev
-RUN apt-get install -y pkg-config automake gcc g++ libtool make nasm tar bzip2 libmp3lame-dev libreoffice
+RUN apt-get install -y pkg-config automake gcc g++ libtool make nasm tar bzip2 libmp3lame-dev 
+RUN apt-get install -y libreoffice libjpeg-dev libpng-dev zlib1g-dev
 
 RUN export MAKEFLAGS="-j$[$(nproc) + 1]"
 
@@ -31,12 +32,11 @@ RUN git clone git://source.ffmpeg.org/ffmpeg.git && cd ffmpeg &&\
 RUN git clone git://git.ghostscript.com/ghostpdl.git && cd ghostpdl && ./autogen.sh &&\
   ./configure && make && make install && make distclean
 
-RUN apt-get install -y libjpeg-dev libpng-dev zlib1g-dev
-
 RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
 
-RUN git clone https://github.com/fyler/tbrecordings.git && cd tbrecordings &&\
-  python setup.py install
+ADD . /tbrecordings
+WORKDIR /tbrecordings
+RUN python setup.py install
 
 RUN useradd -m deplo
 USER deplo
