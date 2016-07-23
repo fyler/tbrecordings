@@ -8,6 +8,7 @@ import tempfile
 import argparse
 import boto3
 import re
+from action import ActionError
 
 logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -33,10 +34,21 @@ def upload(src, bucket, prefix):
   client = boto3.client('s3')
   client.upload_file(src, bucket, os.path.join(prefix, 'recording.mp4'), ExtraArgs={'ACL': 'public-read'})
 
+def notify(msg, arn):
+  logging.info(arn)
+  client = boto3.client('sns')
+  subject = 'TbRecording'
+  response = client.publish(
+      TargetArn = arn,
+      Message = msg,
+      Subject = subject
+  )
+
 def main():
   parser = argparse.ArgumentParser(prog='tbrecording')
   parser.add_argument('-i', dest='input', default=None, help='URL or path to index.json')
   parser.add_argument('-o', dest='output', default=None, help='Place to store obtained recording')
+  parser.add_argument('-sns', dest='sns', default=None, help='SNS')
   args = parser.parse_args()
   omode = 'local'
   opath = ''
@@ -66,7 +78,23 @@ def main():
     tmp = tempfile.mkdtemp()
     fetch(tmp, ibucket, iprefix)
     rec = recording.Recording(os.path.join(tmp, 'index.json'))
-    path = rec.assemble()
-    if omode == 's3':
-      upload(path, obucket, oprefix)
-    shutil.rmtree(tmp)
+    try:
+      path = rec.assemble()
+    except ActionError as e:
+      if not args.sns is None:
+        msg = 'Convertation is failed: %s' % args.input + '\n'
+        msg += str(ActionError)
+        msg += '\n'
+        notify(msg, args.sns)
+      shutil.rmtree(tmp)
+    else:
+      if not args.sns is None:
+        msg = 'Success! Input: %s' % args.input + '\n'
+        if omode == 's3':
+          msg += 'http://' + obucket + '.s3.amazonaws.com/' + oprefix + '/recording.mp4'
+          msg += '\n'
+        notify(msg, args.sns)
+        
+      if omode == 's3':
+        upload(path, obucket, oprefix)
+      shutil.rmtree(tmp)

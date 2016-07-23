@@ -247,5 +247,10 @@ class Concat(Action):
     return cmd
 
   def check(self, out, err):
+    cmd = 'ffprobe -v quiet -print_format json -show_format ' + self.out.fullname
     if not os.path.exists(self.out.fullname):
-      raise ActionError('Concatination failed: %s' % err)
+      raise ActionError('Concatenation failed: %s' % err)
+    else:
+      info = json.loads(shell_cmd(cmd)[0])
+      if not 'format' in info:
+        raise ActionError('Concatenation failed: %s' % err)

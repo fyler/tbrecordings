@@ -48,4 +48,4 @@ RUN mkdir $HOME/.aws/
 
 COPY config $AWS_CONFIG_FILE
 
-ENTRYPOINT tbrecording -i $INPUT
+ENTRYPOINT tbrecording -i $INPUT -sns $SNS
