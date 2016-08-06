@@ -146,6 +146,7 @@ class NotifySNS(object):
 
   def success(self):
     msg = 'Success! Input: %s' % self.__input_desc + '\n' + self.__output_desc + '\n'
+    self.__notify(msg)
 
 class Notify(object):
   def __init__(self, sns, input_desc, output_desc):
@@ -174,10 +175,6 @@ class Processor(object):
   def process(self):
     try:
       self.__process()
-    except ActionError, e:
-      error_msg = str(e) + '\n' + traceback.format_exc()
-      self.__notify.error(error_msg)
-      self.__input.clear()
     except Exception, e:
       error_msg = str(e) + '\n' + traceback.format_exc()
       self.__notify.error(error_msg)
