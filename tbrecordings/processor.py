@@ -71,7 +71,7 @@ class OutputS3(OutputBase):
 
   def upload(self, recording):
     client = boto3.client('s3')
-    client.upload_file(src, self.__bucket, os.path.join(self.__prefix, 'recording.mp4'), ExtraArgs={'ACL': 'public-read'})
+    client.upload_file(recording, self.__bucket, os.path.join(self.__prefix, 'recording.mp4'), ExtraArgs={'ACL': 'public-read'})
 
   def description(self):
     return 'http://' + self.__bucket + '.s3.amazonaws.com/' + self.__prefix + '/recording.mp4'
@@ -103,8 +103,8 @@ class Output(object):
     else:
       self.processor = input_processor.processor.generate_output()
 
-  def upload(self):
-    self.processor.upload()
+  def upload(self, recording):
+    self.processor.upload(recording)
 
   @property
   def description(self):
@@ -170,7 +170,8 @@ class Processor(object):
   def __process(self):
     index = self.__input.fetch()
     rec = recording.Recording(index)
-    self.recording = rec.assemble()
+    rec_file = rec.assemble()
+    self.__output.upload(rec_file)
 
   def process(self):
     try:
@@ -178,7 +179,6 @@ class Processor(object):
     except Exception, e:
       error_msg = str(e) + '\n' + traceback.format_exc()
       self.__notify.error(error_msg)
-      self.__input.clear()
     else:
-      self.__output.upload(self.recording)
       self.__notify.success()
+    self.__input.clear()
