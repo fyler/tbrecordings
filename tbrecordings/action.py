@@ -1,17 +1,15 @@
 import os
 import subprocess
 import logging
-import sys
 import re
 import json
 from file import File
 from PIL import Image
 
-logging.getLogger(__name__)
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def shell_cmd(cmd):
-  logging.info(cmd)
+  logger.info(cmd)
   proc = subprocess.Popen(
     [cmd], 
     stdout=subprocess.PIPE, 

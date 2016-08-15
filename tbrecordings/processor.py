@@ -1,7 +1,6 @@
 import recording
 import shutil
 import os
-import sys
 import json
 import logging
 import tempfile
@@ -10,8 +9,7 @@ import re
 import traceback
 from action import ActionError
 
-logging.getLogger(__name__)
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 p_s3_1 = re.compile(ur'^https?:\/\/([a-zA-Z0-9_\.]+)\.s3\.amazonaws\.com\/([a-zA-Z0-9_\.\/]+)\/(\w+\.json)$')
 p_s3_2  = re.compile(ur'^s3:\/\/([\w\.]+)\/(.*)\/(\w+\.json)$')
@@ -40,7 +38,7 @@ class InputS3(InputBase):
     self.__tmp = tempfile.mkdtemp()
 
   def fetch(self):
-    logging.info('Fetch files from s3 to %s', self.__tmp)
+    logger.info('Fetch files from s3 to %s', self.__tmp)
     client = boto3.client('s3')
     index_json = os.path.join(self.__tmp, 'index.json')
     client.download_file(self.__bucket, os.path.join(self.__prefix, self.__index), index_json)
@@ -121,9 +119,9 @@ class NotifyBase(object):
 
 class NotifyLocal(NotifyBase):    
   def error(self, error_msg):
-    logging.error(error_msg)
+    logger.error(error_msg)
   def success(self):
-    logging.info('Success!')
+    logger.info('Success!')
 
 class NotifySNS(object):
   def __init__(self, arn, input_desc, output_desc):
@@ -174,11 +172,18 @@ class Processor(object):
     self.__output.upload(rec_file)
 
   def process(self):
+    logger.info("Start proccesing")
     try:
       self.__process()
     except Exception, e:
-      error_msg = str(e) + '\n' + traceback.format_exc()
+      tb = traceback.format_exc()
+      logger.error(str(e) + tb)
+      if len(tb) > 100000:
+        tb = tb[:100000]
+      error_msg = str(e) + '\n' + tb
+      logger.info("Error notification")
       self.__notify.error(error_msg)
     else:
+      logger.info("Success notification")
       self.__notify.success()
     self.__input.clear()

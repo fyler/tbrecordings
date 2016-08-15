@@ -1,4 +1,4 @@
-from processor import Processor
+from tbrecordings.processor import Processor
 import argparse
 
 def main():

@@ -8,7 +8,8 @@ setup(
   install_requires=[
     'amfast',
     'boto3',
-    'Pillow'
+    'Pillow',
+    'slacker-log-handler'
   ],
   entry_points = {
     'console_scripts': ['tbrecording=tbrecordings.tbrecording:main']
