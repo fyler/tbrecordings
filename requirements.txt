@@ -1,4 +1,4 @@
 amfast
 boto3
 Pillow
-slacker-log-handler
+PyYaml

@@ -9,7 +9,7 @@ setup(
     'amfast',
     'boto3',
     'Pillow',
-    'slacker-log-handler'
+    'PyYaml'
   ],
   entry_points = {
     'console_scripts': ['tbrecording=tbrecordings.tbrecording:main']
